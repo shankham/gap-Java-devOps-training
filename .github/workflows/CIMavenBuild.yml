@@ -48,29 +48,46 @@ jobs:
       with:
         name: package
         path: staging/
-        
-    - name: Print Build Metadata
-      run: |
-         echo "🔧 Build Metadata"
-         echo "-----------------------------"
-         echo "Repository: ${{ github.repository }}"
-         echo "Workflow: ${{ github.workflow }}"
-         echo "Job: ${{ github.job }}"
-         echo "Run ID: ${{ github.run_id }}"
-         echo "Run Number: ${{ github.run_number }}"
-         echo "Actor (Triggered by): ${{ github.actor }}"
-         echo "Event Name: ${{ github.event_name }}"
-         echo "Commit SHA: ${{ github.sha }}"
-         echo "Commit URL: https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-         echo "Branch Ref: ${{ github.ref }}"
-         echo "Branch Name: ${GITHUB_REF#refs/heads/}"
-         echo "Build Time: $(date -u)"
-         echo "Runner OS: ${{ runner.os }}"
-         echo "Runner Name: ${{ runner.name }}"
-         echo "Runner Arch: ${{ runner.arch }}"
-         echo "Workflow URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-         echo "Repository URL: https://github.com/${{ github.repository }}"
-         echo "Head Ref (PR): ${{ github.head_ref }}"
-         echo "Base Ref (PR): ${{ github.base_ref }}"
-         echo "Workspace: ${{ github.workspace }}"
-         echo "GitHub Server URL: ${{ github.server_url }}"
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.14.1
+        with:
+          java-version: '17'
+          distribution: 'oracle'
+      - name: Run Maven Tests
+        run: mvn test
+  package:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v5.0.0
+        with:
+          name: java-build
+          path: staging
+      - name: List downloaded files
+        run: ls staging
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    needs: [package ]
+    steps:
+      - name: Deployment Step
+        run: |
+          echo "Deploying application..."
+          echo "Environment: ${{ inputs.TARGE_ENVIRONMENT }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Commit: ${{ github.sha }}"
+
+
+
+
+            
+   
