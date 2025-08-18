@@ -49,10 +49,22 @@ jobs:
         name: spring-boot-jpa-postgresql
         path: staging/
 
-  
-  package:
+  test:
     runs-on: ubuntu-latest
     needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.14.1
+        with:
+          java-version: '17'
+          distribution: 'oracle'
+      - name: Run Maven Tests
+        run: mvn test
+  package:
+    runs-on: ubuntu-latest
+    needs: test 
     steps:
       - name: Download a Build Artifact
         uses: actions/download-artifact@v5.0.0
