@@ -51,6 +51,18 @@ jobs:
         
     - name: Run Maven Tests
       run: mvn test
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v5.0.0
+        with:
+          name: spring-boot-jpa-postgresql
+          path: staging
+      - name: Run Maven Tests
+        run: mvn test
   
   package:
     runs-on: ubuntu-latest
