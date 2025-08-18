@@ -58,7 +58,7 @@ jobs:
         uses: actions/download-artifact@v5.0.0
         with:
     #      name: java-build
-          name: spring-boot-jpa-postgresql
+          name: package
           path: staging
       - name: List downloaded files
         run: ls staging
